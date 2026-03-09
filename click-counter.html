@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Click Counter</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0f2f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      padding: 48px 56px;
+      text-align: center;
+      width: 320px;
+    }
+
+    .label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 12px;
+    }
+
+    .count {
+      font-size: 80px;
+      font-weight: 700;
+      line-height: 1;
+      color: #111827;
+      margin-bottom: 40px;
+      transition: transform 0.1s ease, color 0.2s ease;
+    }
+
+    .count.bump {
+      transform: scale(1.15);
+      color: #4f46e5;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #4f46e5;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+      box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+    }
+
+    .btn:hover {
+      background: #4338ca;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45);
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 1px 4px rgba(79, 70, 229, 0.3);
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid #a5b4fc;
+      outline-offset: 3px;
+    }
+
+    .reset-btn {
+      margin-top: 16px;
+      background: none;
+      border: none;
+      font-size: 13px;
+      color: #9ca3af;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .reset-btn:hover {
+      color: #6b7280;
+      background: #f3f4f6;
+    }
+
+    .reset-btn:focus-visible {
+      outline: 2px solid #a5b4fc;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p class="label">Total Clicks</p>
+    <div class="count" id="count" aria-live="polite" aria-atomic="true">0</div>
+    <button class="btn" id="click-btn" aria-label="Click to increment counter">
+      Click Me
+    </button>
+    <br>
+    <button class="reset-btn" id="reset-btn" aria-label="Reset counter to zero">
+      Reset
+    </button>
+  </div>
+
+  <script>
+    (function () {
+      var count = 0;
+      var countEl = document.getElementById('count');
+      var clickBtn = document.getElementById('click-btn');
+      var resetBtn = document.getElementById('reset-btn');
+
+      function setCount(value) {
+        count = value;
+        countEl.textContent = count;
+      }
+
+      function bump() {
+        countEl.classList.remove('bump');
+        // Force reflow so the animation restarts if clicked rapidly
+        void countEl.offsetWidth;
+        countEl.classList.add('bump');
+      }
+
+      clickBtn.addEventListener('click', function () {
+        setCount(count + 1);
+        bump();
+      });
+
+      resetBtn.addEventListener('click', function () {
+        setCount(0);
+      });
+
+      countEl.addEventListener('animationend', function () {
+        countEl.classList.remove('bump');
+      });
+
+      countEl.addEventListener('transitionend', function () {
+        countEl.classList.remove('bump');
+      });
+    })();
+  </script>
+</body>
+</html>
