@@ -11,73 +11,214 @@
       padding: 0;
     }
 
+    :root {
+      --bg: #f0f2f5;
+      --card-bg: #ffffff;
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --primary-shadow: rgba(79, 70, 229, 0.35);
+      --primary-shadow-hover: rgba(79, 70, 229, 0.45);
+      --count-color: #111827;
+      --label-color: #9ca3af;
+      --transition-speed: 0.8s;
+    }
+
     body {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f0f2f5;
+      background: var(--bg);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      transition: background var(--transition-speed) ease;
+      overflow: hidden;
     }
 
+    /* ── Canvas for particles ── */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* ── Card ── */
     .card {
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-      padding: 48px 56px;
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 4px 32px rgba(0, 0, 0, 0.10);
+      padding: 48px 56px 40px;
       text-align: center;
-      width: 320px;
+      width: 340px;
+      position: relative;
+      z-index: 20;
+      transition: background var(--transition-speed) ease,
+                  box-shadow var(--transition-speed) ease,
+                  transform 0.15s ease;
     }
 
+    .card.card-shake {
+      animation: card-shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    @keyframes card-shake {
+      10%, 90%  { transform: translate3d(-2px, 0, 0); }
+      20%, 80%  { transform: translate3d( 4px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60%  { transform: translate3d( 4px, 0, 0); }
+    }
+
+    /* ── Character mascot ── */
+    #mascot {
+      font-size: 40px;
+      line-height: 1;
+      margin-bottom: 8px;
+      display: block;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: default;
+      user-select: none;
+    }
+
+    #mascot.mascot-react {
+      animation: mascot-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes mascot-pop {
+      0%   { transform: scale(1) rotate(0deg); }
+      40%  { transform: scale(1.4) rotate(-8deg); }
+      70%  { transform: scale(0.9) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    /* ── Label ── */
     .label {
       font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #9ca3af;
-      margin-bottom: 12px;
+      color: var(--label-color);
+      margin-bottom: 10px;
+      transition: color var(--transition-speed) ease;
     }
 
+    /* ── Count display ── */
     .count {
       font-size: 80px;
       font-weight: 700;
       line-height: 1;
-      color: #111827;
-      margin-bottom: 40px;
-      transition: transform 0.1s ease, color 0.2s ease;
+      color: var(--count-color);
+      margin-bottom: 12px;
+      transition: transform 0.12s ease, color var(--transition-speed) ease;
+      position: relative;
+      display: inline-block;
     }
 
     .count.bump {
-      transform: scale(1.15);
-      color: #4f46e5;
+      animation: count-bump 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
+    @keyframes count-bump {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.22); }
+      100% { transform: scale(1); }
+    }
+
+    /* ── Personality message ── */
+    #personality-msg {
+      font-size: 13px;
+      font-style: italic;
+      color: var(--label-color);
+      min-height: 20px;
+      margin-bottom: 28px;
+      transition: color var(--transition-speed) ease, opacity 0.3s ease;
+      opacity: 1;
+    }
+
+    #personality-msg.msg-fade {
+      animation: msg-swap 0.4s ease;
+    }
+
+    @keyframes msg-swap {
+      0%   { opacity: 1; transform: translateY(0); }
+      40%  { opacity: 0; transform: translateY(-6px); }
+      60%  { opacity: 0; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Milestone toast ── */
+    #milestone-toast {
+      position: fixed;
+      top: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-120px);
+      background: var(--primary);
+      color: #fff;
+      border-radius: 40px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+      z-index: 100;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background var(--transition-speed) ease;
+      pointer-events: none;
+    }
+
+    #milestone-toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Click button ── */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      background: #4f46e5;
+      background: var(--primary);
       color: #ffffff;
       border: none;
-      border-radius: 10px;
-      padding: 14px 32px;
+      border-radius: 12px;
+      padding: 15px 32px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       width: 100%;
-      transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
-      box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+      transition: background 0.2s ease,
+                  transform 0.1s ease,
+                  box-shadow 0.2s ease;
+      box-shadow: 0 3px 12px var(--primary-shadow);
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.02em;
+    }
+
+    /* Shimmer sweep on hover */
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+      transition: left 0.45s ease;
+      pointer-events: none;
     }
 
     .btn:hover {
-      background: #4338ca;
-      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45);
+      background: var(--primary-dark);
+      box-shadow: 0 5px 18px var(--primary-shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn:hover::after {
+      left: 140%;
     }
 
     .btn:active {
-      transform: scale(0.97);
-      box-shadow: 0 1px 4px rgba(79, 70, 229, 0.3);
+      transform: translateY(0) scale(0.96);
+      box-shadow: 0 2px 6px var(--primary-shadow);
     }
 
     .btn:focus-visible {
@@ -85,8 +226,36 @@
       outline-offset: 3px;
     }
 
+    /* ── Progress bar ── */
+    .progress-wrap {
+      height: 5px;
+      background: #e5e7eb;
+      border-radius: 99px;
+      margin: 18px 0 4px;
+      overflow: hidden;
+      transition: background var(--transition-speed) ease;
+    }
+
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      border-radius: 99px;
+      transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background var(--transition-speed) ease;
+    }
+
+    .progress-label {
+      font-size: 11px;
+      color: var(--label-color);
+      text-align: right;
+      margin-bottom: 14px;
+      transition: color var(--transition-speed) ease;
+    }
+
+    /* ── Reset button ── */
     .reset-btn {
-      margin-top: 16px;
+      margin-top: 14px;
       background: none;
       border: none;
       font-size: 13px;
@@ -106,12 +275,47 @@
       outline: 2px solid #a5b4fc;
       outline-offset: 2px;
     }
+
+    /* ── Floating emoji burst ── */
+    .float-emoji {
+      position: fixed;
+      font-size: 22px;
+      pointer-events: none;
+      z-index: 50;
+      animation: float-up 1.4s ease-out forwards;
+    }
+
+    @keyframes float-up {
+      0%   { opacity: 1; transform: translateY(0)   scale(1)   rotate(0deg); }
+      100% { opacity: 0; transform: translateY(-130px) scale(0.5) rotate(30deg); }
+    }
+
+    /* ── Theme color overrides applied via JS on body data-theme ── */
+
+    /* -- Reduce-motion respect -- */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.15s !important;
+      }
+    }
   </style>
 </head>
-<body>
-  <div class="card">
-    <p class="label">Total Clicks</p>
+<body data-theme="default">
+
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="card" id="card">
+    <span id="mascot" role="img" aria-label="mascot character">🙂</span>
+    <p class="label" id="label-text">Total Clicks</p>
     <div class="count" id="count" aria-live="polite" aria-atomic="true">0</div>
+    <p id="personality-msg">Go on — give it a tap.</p>
+
+    <div class="progress-wrap">
+      <div id="progress-bar"></div>
+    </div>
+    <p class="progress-label" id="progress-label">Next milestone: 10</p>
+
     <button class="btn" id="click-btn" aria-label="Click to increment counter">
       Click Me
     </button>
@@ -121,42 +325,638 @@
     </button>
   </div>
 
+  <div id="milestone-toast" role="status" aria-live="assertive"></div>
+
   <script>
-    (function () {
-      var count = 0;
-      var countEl = document.getElementById('count');
-      var clickBtn = document.getElementById('click-btn');
-      var resetBtn = document.getElementById('reset-btn');
+  (function () {
+    'use strict';
 
-      function setCount(value) {
-        count = value;
-        countEl.textContent = count;
+    /* ─────────────────────────────────────────────
+       State
+    ───────────────────────────────────────────── */
+    var count = 0;
+
+    /* ─────────────────────────────────────────────
+       DOM refs
+    ───────────────────────────────────────────── */
+    var countEl      = document.getElementById('count');
+    var clickBtn     = document.getElementById('click-btn');
+    var resetBtn     = document.getElementById('reset-btn');
+    var mascotEl     = document.getElementById('mascot');
+    var msgEl        = document.getElementById('personality-msg');
+    var progressBar  = document.getElementById('progress-bar');
+    var progressLbl  = document.getElementById('progress-label');
+    var toast        = document.getElementById('milestone-toast');
+    var card         = document.getElementById('card');
+    var canvas       = document.getElementById('particle-canvas');
+    var ctx          = canvas.getContext('2d');
+
+    /* ─────────────────────────────────────────────
+       Resize canvas
+    ───────────────────────────────────────────── */
+    function resizeCanvas() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    /* ─────────────────────────────────────────────
+       Themes – evolve as count grows
+    ───────────────────────────────────────────── */
+    var themes = [
+      /* 0–9: calm indigo */
+      {
+        bg:          '#f0f2f5',
+        cardBg:      '#ffffff',
+        primary:     '#4f46e5',
+        primaryDark: '#4338ca',
+        pShadow:     'rgba(79,70,229,0.35)',
+        pShadowHov:  'rgba(79,70,229,0.45)',
+        countColor:  '#111827',
+        labelColor:  '#9ca3af'
+      },
+      /* 10–24: warm violet-rose */
+      {
+        bg:          '#fdf4ff',
+        cardBg:      '#fff8fe',
+        primary:     '#9333ea',
+        primaryDark: '#7e22ce',
+        pShadow:     'rgba(147,51,234,0.35)',
+        pShadowHov:  'rgba(147,51,234,0.48)',
+        countColor:  '#4a044e',
+        labelColor:  '#c084fc'
+      },
+      /* 25–49: sunset coral-orange */
+      {
+        bg:          '#fff7ed',
+        cardBg:      '#fffbf7',
+        primary:     '#ea580c',
+        primaryDark: '#c2410c',
+        pShadow:     'rgba(234,88,12,0.35)',
+        pShadowHov:  'rgba(234,88,12,0.48)',
+        countColor:  '#431407',
+        labelColor:  '#fb923c'
+      },
+      /* 50–99: tropical teal */
+      {
+        bg:          '#f0fdfa',
+        cardBg:      '#f7fffe',
+        primary:     '#0d9488',
+        primaryDark: '#0f766e',
+        pShadow:     'rgba(13,148,136,0.35)',
+        pShadowHov:  'rgba(13,148,136,0.48)',
+        countColor:  '#042f2e',
+        labelColor:  '#2dd4bf'
+      },
+      /* 100+: pure gold champion */
+      {
+        bg:          '#fefce8',
+        cardBg:      '#fffef5',
+        primary:     '#ca8a04',
+        primaryDark: '#a16207',
+        pShadow:     'rgba(202,138,4,0.40)',
+        pShadowHov:  'rgba(202,138,4,0.55)',
+        countColor:  '#713f12',
+        labelColor:  '#fbbf24'
+      }
+    ];
+
+    function themeIndex(n) {
+      if (n >= 100) return 4;
+      if (n >= 50)  return 3;
+      if (n >= 25)  return 2;
+      if (n >= 10)  return 1;
+      return 0;
+    }
+
+    var currentThemeIdx = 0;
+
+    function applyTheme(idx) {
+      if (idx === currentThemeIdx && count !== 0) return;
+      currentThemeIdx = idx;
+      var t = themes[idx];
+      var r = document.documentElement.style;
+      r.setProperty('--bg',                t.bg);
+      r.setProperty('--card-bg',           t.cardBg);
+      r.setProperty('--primary',           t.primary);
+      r.setProperty('--primary-dark',      t.primaryDark);
+      r.setProperty('--primary-shadow',    t.pShadow);
+      r.setProperty('--primary-shadow-hover', t.pShadowHov);
+      r.setProperty('--count-color',       t.countColor);
+      r.setProperty('--label-color',       t.labelColor);
+      document.body.style.background = t.bg;
+    }
+
+    /* ─────────────────────────────────────────────
+       Mascot progression
+    ───────────────────────────────────────────── */
+    var mascots = [
+      { threshold: 0,   emoji: '🙂',  label: 'happy face' },
+      { threshold: 5,   emoji: '😏',  label: 'smirk face' },
+      { threshold: 10,  emoji: '😄',  label: 'grinning face' },
+      { threshold: 20,  emoji: '😲',  label: 'astonished face' },
+      { threshold: 30,  emoji: '🤩',  label: 'star-struck face' },
+      { threshold: 50,  emoji: '🔥',  label: 'fire' },
+      { threshold: 75,  emoji: '🤯',  label: 'exploding head' },
+      { threshold: 100, emoji: '👑',  label: 'crown' }
+    ];
+
+    function getMascot(n) {
+      var result = mascots[0];
+      for (var i = 0; i < mascots.length; i++) {
+        if (n >= mascots[i].threshold) result = mascots[i];
+      }
+      return result;
+    }
+
+    var activeMascot = mascots[0];
+
+    function updateMascot(n) {
+      var next = getMascot(n);
+      if (next.emoji !== activeMascot.emoji) {
+        activeMascot = next;
+        mascotEl.textContent = next.emoji;
+        mascotEl.setAttribute('aria-label', next.label);
+      }
+      mascotEl.classList.remove('mascot-react');
+      void mascotEl.offsetWidth;
+      mascotEl.classList.add('mascot-react');
+    }
+
+    /* ─────────────────────────────────────────────
+       Personality messages (bucket by range)
+    ───────────────────────────────────────────── */
+    var personalities = {
+      0:   ["Go on — give it a tap.",
+            "I dare you to click me.",
+            "Something will happen. Probably."],
+      1:   ["Oh, you clicked! Bold move.",
+            "Just one? Interesting choice.",
+            "I felt that."],
+      5:   ["You're getting into it, aren't you?",
+            "Five clicks deep. No going back.",
+            "I knew you couldn't resist."],
+      10:  ["Double digits. You're committed.",
+            "I've been clicked worse things.",
+            "Still here? I respect that."],
+      20:  ["Twenty?! Are you okay?",
+            "Your pointer finger must be tired.",
+            "I'm genuinely flattered."],
+      30:  ["Thirty. The magic number. Probably.",
+            "At this point we're friends.",
+            "I've been awoken."],
+      50:  ["FIFTY. You need a hobby.",
+            "I would call this obsessive but same.",
+            "We don't talk about the fifty-click club."],
+      75:  ["Seventy-five. I'm running out of sass.",
+            "Your dedication is alarming and wonderful.",
+            "Almost to a hundred. Don't stop now."],
+      100: ["ONE HUNDRED. You absolute legend.",
+            "Certified click goblin.",
+            "They said it couldn't be done. Wrong."],
+      150: ["150 clicks. Please. I'm begging you. (Keep going.)",
+            "At this point you're basically my favorite person.",
+            "I've lost count of how many times you've saved me from boredom."],
+      200: ["200. This is beyond the lore.",
+            "I have transcended the button.",
+            "Click me once more and I might propose."]
+    };
+
+    var bucketKeys = Object.keys(personalities)
+      .map(Number)
+      .sort(function(a, b) { return a - b; });
+
+    function getBucket(n) {
+      var bucket = 0;
+      for (var i = 0; i < bucketKeys.length; i++) {
+        if (n >= bucketKeys[i]) bucket = bucketKeys[i];
+      }
+      return bucket;
+    }
+
+    var lastMsgBucket = -1;
+    var usedMsgs = {};
+
+    function getPersonalityMsg(n) {
+      var bucket = getBucket(n);
+      if (!usedMsgs[bucket]) usedMsgs[bucket] = [];
+      var pool  = personalities[bucket];
+      var avail = pool.filter(function(m) { return usedMsgs[bucket].indexOf(m) === -1; });
+      if (avail.length === 0) {
+        usedMsgs[bucket] = [];
+        avail = pool.slice();
+      }
+      var chosen = avail[Math.floor(Math.random() * avail.length)];
+      usedMsgs[bucket].push(chosen);
+      return chosen;
+    }
+
+    var msgUpdateInterval = 3; // update every N clicks
+
+    function updatePersonality(n) {
+      var bucket = getBucket(n);
+      var bucketChanged = bucket !== lastMsgBucket;
+      if (bucketChanged || n % msgUpdateInterval === 0) {
+        lastMsgBucket = bucket;
+        var msg = getPersonalityMsg(n);
+        msgEl.classList.remove('msg-fade');
+        void msgEl.offsetWidth;
+        msgEl.classList.add('msg-fade');
+        setTimeout(function() { msgEl.textContent = msg; }, 80);
+      }
+    }
+
+    /* ─────────────────────────────────────────────
+       Button label evolution
+    ───────────────────────────────────────────── */
+    var btnLabels = [
+      { threshold: 0,   label: 'Click Me' },
+      { threshold: 5,   label: 'Again!' },
+      { threshold: 10,  label: 'Keep Going' },
+      { threshold: 20,  label: 'More.' },
+      { threshold: 30,  label: 'YES' },
+      { threshold: 50,  label: 'UNLEASH IT' },
+      { threshold: 75,  label: 'DO NOT STOP' },
+      { threshold: 100, label: '(you legend)' },
+      { threshold: 150, label: 'Beyond the Veil' },
+      { threshold: 200, label: '...' }
+    ];
+
+    function getBtnLabel(n) {
+      var result = btnLabels[0];
+      for (var i = 0; i < btnLabels.length; i++) {
+        if (n >= btnLabels[i].threshold) result = btnLabels[i];
+      }
+      return result.label;
+    }
+
+    var lastBtnLabel = '';
+
+    function updateBtnLabel(n) {
+      var lbl = getBtnLabel(n);
+      if (lbl !== lastBtnLabel) {
+        lastBtnLabel = lbl;
+        clickBtn.textContent = lbl;
+        clickBtn.setAttribute('aria-label', 'Click to increment counter — ' + lbl);
+      }
+    }
+
+    /* ─────────────────────────────────────────────
+       Milestones
+    ───────────────────────────────────────────── */
+    var milestones = {
+      10:  '10 clicks! You warmed up!',
+      25:  '25! A quarter-century of clicks!',
+      50:  '50! Halfway to legendary!',
+      100: '100 CLICKS! YOU ARE THE CHOSEN ONE!',
+      150: '150! There are no words.',
+      200: '200! The button gods are pleased.'
+    };
+
+    var milestoneSeen = {};
+    var toastTimer;
+
+    function showMilestone(n) {
+      if (!milestones[n] || milestoneSeen[n]) return;
+      milestoneSeen[n] = true;
+
+      toast.textContent = milestones[n];
+      toast.classList.add('show');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () {
+        toast.classList.remove('show');
+      }, 3200);
+
+      spawnConfetti(n >= 100 ? 120 : 60);
+      cardShake();
+    }
+
+    /* ─────────────────────────────────────────────
+       Progress bar toward next milestone
+    ───────────────────────────────────────────── */
+    var milestoneList = [10, 25, 50, 100, 150, 200];
+
+    function updateProgress(n) {
+      var prev = 0;
+      var next = milestoneList[0];
+      for (var i = 0; i < milestoneList.length; i++) {
+        if (n >= milestoneList[i]) {
+          prev = milestoneList[i];
+          next = milestoneList[i + 1] || null;
+        }
+      }
+      if (next === null) {
+        progressBar.style.width = '100%';
+        progressLbl.textContent = 'All milestones cleared!';
+      } else {
+        var pct = ((n - prev) / (next - prev)) * 100;
+        progressBar.style.width = Math.min(pct, 100) + '%';
+        progressLbl.textContent = 'Next milestone: ' + next;
+      }
+    }
+
+    /* ─────────────────────────────────────────────
+       Card shake
+    ───────────────────────────────────────────── */
+    function cardShake() {
+      card.classList.remove('card-shake');
+      void card.offsetWidth;
+      card.classList.add('card-shake');
+    }
+
+    /* ─────────────────────────────────────────────
+       Web Audio – synthesised click sounds
+    ───────────────────────────────────────────── */
+    var audioCtx;
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        try {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) { audioCtx = null; }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playClick(n) {
+      ensureAudio();
+      if (!audioCtx) return;
+
+      // Pitch rises gently with count, caps out, then gets silly at 100
+      var baseFreq = 220 + Math.min(n * 3, 300);
+      if (n >= 100) baseFreq = 880;
+
+      var osc  = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.type = n >= 50 ? 'sine' : 'triangle';
+      osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(
+        baseFreq * (n >= 100 ? 2.5 : 1.5),
+        audioCtx.currentTime + 0.12
+      );
+
+      gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + 0.2);
+    }
+
+    function playMilestoneSound() {
+      ensureAudio();
+      if (!audioCtx) return;
+      var notes = [523, 659, 784, 1047]; // C5 E5 G5 C6
+      notes.forEach(function(freq, i) {
+        var osc  = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        var t = audioCtx.currentTime + i * 0.12;
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.20, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+        osc.start(t);
+        osc.stop(t + 0.4);
+      });
+    }
+
+    /* ─────────────────────────────────────────────
+       Particle confetti system
+    ───────────────────────────────────────────── */
+    var particles = [];
+
+    var PALETTE = [
+      '#f43f5e','#f97316','#facc15','#4ade80',
+      '#22d3ee','#818cf8','#e879f9','#fb7185'
+    ];
+
+    function randomBetween(a, b) { return a + Math.random() * (b - a); }
+
+    function spawnConfetti(count) {
+      var cx = canvas.width  / 2;
+      var cy = canvas.height / 2;
+      for (var i = 0; i < count; i++) {
+        var angle = randomBetween(0, Math.PI * 2);
+        var speed = randomBetween(3, 11);
+        particles.push({
+          x:     cx,
+          y:     cy,
+          vx:    Math.cos(angle) * speed,
+          vy:    Math.sin(angle) * speed - randomBetween(1, 4),
+          w:     randomBetween(6, 13),
+          h:     randomBetween(4, 9),
+          color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
+          rot:   randomBetween(0, Math.PI * 2),
+          rotV:  randomBetween(-0.18, 0.18),
+          life:  1.0,
+          decay: randomBetween(0.014, 0.028)
+        });
+      }
+      if (!animating) requestAnimationFrame(animateParticles);
+    }
+
+    function spawnMiniParticles(x, y, n) {
+      /* Small burst from click position */
+      var burst = n >= 50 ? 14 : (n >= 20 ? 8 : 5);
+      for (var i = 0; i < burst; i++) {
+        var angle = randomBetween(0, Math.PI * 2);
+        var speed = randomBetween(2, 7);
+        particles.push({
+          x:     x,
+          y:     y,
+          vx:    Math.cos(angle) * speed,
+          vy:    Math.sin(angle) * speed,
+          w:     randomBetween(4, 8),
+          h:     randomBetween(3, 6),
+          color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
+          rot:   randomBetween(0, Math.PI * 2),
+          rotV:  randomBetween(-0.25, 0.25),
+          life:  1.0,
+          decay: randomBetween(0.03, 0.06)
+        });
+      }
+      if (!animating) requestAnimationFrame(animateParticles);
+    }
+
+    var animating = false;
+
+    function animateParticles() {
+      if (particles.length === 0) { animating = false; return; }
+      animating = true;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (var i = particles.length - 1; i >= 0; i--) {
+        var p = particles[i];
+        p.x   += p.vx;
+        p.y   += p.vy;
+        p.vy  += 0.25; // gravity
+        p.vx  *= 0.98; // air drag
+        p.rot += p.rotV;
+        p.life -= p.decay;
+
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
+
+        ctx.save();
+        ctx.globalAlpha = p.life;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
       }
 
-      function bump() {
-        countEl.classList.remove('bump');
-        // Force reflow so the animation restarts if clicked rapidly
-        void countEl.offsetWidth;
-        countEl.classList.add('bump');
+      requestAnimationFrame(animateParticles);
+    }
+
+    /* ─────────────────────────────────────────────
+       Floating emoji burst from button
+    ───────────────────────────────────────────── */
+    var floatPool = ['✨','💥','⚡','🌟','💫','🎉','🎊','💖','🔥'];
+
+    function spawnFloatEmoji(x, y, n) {
+      /* Only for notable clicks */
+      if (n < 5 && n % 5 !== 0) return;
+      var emoji = floatPool[Math.floor(Math.random() * floatPool.length)];
+      var el = document.createElement('span');
+      el.className = 'float-emoji';
+      el.textContent = emoji;
+      el.setAttribute('aria-hidden', 'true');
+      el.style.left = (x - 12 + randomBetween(-24, 24)) + 'px';
+      el.style.top  = (y - 20) + 'px';
+      document.body.appendChild(el);
+      setTimeout(function() { el.remove(); }, 1500);
+    }
+
+    /* ─────────────────────────────────────────────
+       Main click handler
+    ───────────────────────────────────────────── */
+    clickBtn.addEventListener('click', function (e) {
+      count += 1;
+
+      /* Sound */
+      playClick(count);
+      if (milestones[count]) playMilestoneSound();
+
+      /* Count display bump */
+      countEl.textContent = count;
+      countEl.classList.remove('bump');
+      void countEl.offsetWidth;
+      countEl.classList.add('bump');
+
+      /* Theme */
+      applyTheme(themeIndex(count));
+
+      /* Mascot */
+      updateMascot(count);
+
+      /* Personality copy */
+      updatePersonality(count);
+
+      /* Button label */
+      updateBtnLabel(count);
+
+      /* Progress */
+      updateProgress(count);
+
+      /* Milestone */
+      showMilestone(count);
+
+      /* Particles from click position */
+      var rect = clickBtn.getBoundingClientRect();
+      var cx   = rect.left + rect.width  / 2;
+      var cy   = rect.top  + rect.height / 2;
+      spawnMiniParticles(cx, cy, count);
+      spawnFloatEmoji(cx, cy, count);
+    });
+
+    /* ─────────────────────────────────────────────
+       Reset
+    ───────────────────────────────────────────── */
+    resetBtn.addEventListener('click', function () {
+      count = 0;
+      countEl.textContent = 0;
+      applyTheme(0);
+      currentThemeIdx = -1; // force re-apply next click
+      updateMascot(0);
+      activeMascot = mascots[0];
+      mascotEl.textContent = mascots[0].emoji;
+      msgEl.textContent = 'Go on — give it a tap.';
+      lastMsgBucket = -1;
+      usedMsgs = {};
+      clickBtn.textContent = 'Click Me';
+      lastBtnLabel = '';
+      progressBar.style.width = '0%';
+      progressLbl.textContent = 'Next milestone: 10';
+      milestoneSeen = {};
+      toast.classList.remove('show');
+      particles = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    /* ─────────────────────────────────────────────
+       Transition cleanup
+    ───────────────────────────────────────────── */
+    countEl.addEventListener('animationend', function () {
+      countEl.classList.remove('bump');
+    });
+
+    mascotEl.addEventListener('animationend', function () {
+      mascotEl.classList.remove('mascot-react');
+    });
+
+    msgEl.addEventListener('animationend', function () {
+      msgEl.classList.remove('msg-fade');
+    });
+
+    card.addEventListener('animationend', function () {
+      card.classList.remove('card-shake');
+    });
+
+    /* ─────────────────────────────────────────────
+       Konami code Easter egg
+    ───────────────────────────────────────────── */
+    var KONAMI = [38,38,40,40,37,39,37,39,66,65];
+    var konamiSeq = [];
+    document.addEventListener('keydown', function (e) {
+      konamiSeq.push(e.keyCode);
+      konamiSeq = konamiSeq.slice(-10);
+      if (konamiSeq.join(',') === KONAMI.join(',')) {
+        spawnConfetti(200);
+        ensureAudio();
+        playMilestoneSound();
+        var t = document.createElement('div');
+        t.textContent = '  KONAMI CODE!  You are a true legend.';
+        t.setAttribute('aria-live', 'polite');
+        t.style.cssText = [
+          'position:fixed','top:80px','left:50%',
+          'transform:translateX(-50%)',
+          'background:linear-gradient(135deg,#f43f5e,#f97316,#facc15,#4ade80,#818cf8)',
+          'color:#fff','font-weight:800','font-size:18px',
+          'padding:14px 32px','border-radius:40px',
+          'box-shadow:0 8px 32px rgba(0,0,0,0.25)',
+          'z-index:200','pointer-events:none',
+          'animation:float-up 3s ease-out forwards'
+        ].join(';');
+        document.body.appendChild(t);
+        setTimeout(function() { t.remove(); }, 3100);
       }
+    });
 
-      clickBtn.addEventListener('click', function () {
-        setCount(count + 1);
-        bump();
-      });
+    /* ─────────────────────────────────────────────
+       Init
+    ───────────────────────────────────────────── */
+    applyTheme(0);
+    updateProgress(0);
 
-      resetBtn.addEventListener('click', function () {
-        setCount(0);
-      });
-
-      countEl.addEventListener('animationend', function () {
-        countEl.classList.remove('bump');
-      });
-
-      countEl.addEventListener('transitionend', function () {
-        countEl.classList.remove('bump');
-      });
-    })();
+  })();
   </script>
 </body>
 </html>
