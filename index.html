@@ -90,6 +90,86 @@
       100% { transform: scale(1) rotate(0deg); }
     }
 
+    /* ── AI speech bubble ── */
+    #ai-bubble {
+      position: relative;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 500;
+      margin: 0 0 10px;
+      text-align: left;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background var(--transition-speed) ease,
+                  opacity 0.3s ease,
+                  transform 0.3s ease;
+      opacity: 0;
+      transform: translateY(4px) scale(0.97);
+      pointer-events: none;
+    }
+
+    /* Tail pointing up toward mascot */
+    #ai-bubble::before {
+      content: '';
+      position: absolute;
+      top: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-bottom: 7px solid var(--primary);
+      transition: border-bottom-color var(--transition-speed) ease;
+    }
+
+    #ai-bubble.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    #ai-bubble.loading .ai-bubble-text::after {
+      content: '';
+      display: inline-block;
+      width: 10px;
+      animation: ellipsis-dot 1.2s infinite;
+    }
+
+    @keyframes ellipsis-dot {
+      0%   { content: '.'; }
+      33%  { content: '..'; }
+      66%  { content: '...'; }
+      100% { content: '.'; }
+    }
+
+    /* Claude spark icon */
+    .ai-bubble-icon {
+      flex-shrink: 0;
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .ai-bubble-text {
+      flex: 1;
+    }
+
+    /* Fade-swap animation for new AI messages */
+    #ai-bubble.ai-swap {
+      animation: ai-msg-swap 0.45s ease;
+    }
+
+    @keyframes ai-msg-swap {
+      0%   { opacity: 1; transform: translateY(0)   scale(1); }
+      35%  { opacity: 0; transform: translateY(-5px) scale(0.96); }
+      60%  { opacity: 0; transform: translateY(5px)  scale(0.96); }
+      100% { opacity: 1; transform: translateY(0)   scale(1); }
+    }
+
     /* ── Label ── */
     .label {
       font-size: 13px;
@@ -276,6 +356,112 @@
       outline-offset: 2px;
     }
 
+    /* ── API key settings section ── */
+    .api-settings {
+      margin-top: 20px;
+      border-top: 1px solid #f3f4f6;
+      padding-top: 12px;
+    }
+
+    .api-settings-toggle {
+      background: none;
+      border: none;
+      font-size: 11px;
+      color: #c4c9d4;
+      cursor: pointer;
+      padding: 2px 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+      justify-content: center;
+      transition: color 0.15s ease;
+      letter-spacing: 0.03em;
+    }
+
+    .api-settings-toggle:hover {
+      color: #9ca3af;
+    }
+
+    .api-settings-toggle:focus-visible {
+      outline: 2px solid #a5b4fc;
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    .api-settings-toggle .toggle-arrow {
+      display: inline-block;
+      transition: transform 0.2s ease;
+      font-style: normal;
+    }
+
+    .api-settings.open .toggle-arrow {
+      transform: rotate(180deg);
+    }
+
+    .api-settings-body {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.28s ease, opacity 0.22s ease;
+    }
+
+    .api-settings.open .api-settings-body {
+      max-height: 120px;
+      opacity: 1;
+    }
+
+    .api-settings-inner {
+      padding: 10px 2px 2px;
+      text-align: left;
+    }
+
+    .api-key-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #9ca3af;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .api-key-input {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: inherit;
+      color: #374151;
+      background: #fafafa;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      outline: none;
+    }
+
+    .api-key-input:focus {
+      border-color: #a5b4fc;
+      box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.25);
+      background: #fff;
+    }
+
+    .api-key-hint {
+      font-size: 10px;
+      color: #c4c9d4;
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    .api-key-hint a {
+      color: #c4c9d4;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .api-key-hint a:hover {
+      color: #9ca3af;
+    }
+
     /* ── Floating emoji burst ── */
     .float-emoji {
       position: fixed;
@@ -307,6 +493,13 @@
 
   <div class="card" id="card">
     <span id="mascot" role="img" aria-label="mascot character">🙂</span>
+
+    <!-- AI speech bubble — hidden until a response arrives -->
+    <div id="ai-bubble" role="status" aria-live="polite" aria-atomic="true">
+      <span class="ai-bubble-icon" aria-hidden="true">✨</span>
+      <span class="ai-bubble-text" id="ai-bubble-text"></span>
+    </div>
+
     <p class="label" id="label-text">Total Clicks</p>
     <div class="count" id="count" aria-live="polite" aria-atomic="true">0</div>
     <p id="personality-msg">Go on — give it a tap.</p>
@@ -323,6 +516,31 @@
     <button class="reset-btn" id="reset-btn" aria-label="Reset counter to zero">
       Reset
     </button>
+
+    <!-- API key settings — collapsed by default -->
+    <div class="api-settings" id="api-settings">
+      <button class="api-settings-toggle" id="api-settings-toggle" aria-expanded="false" aria-controls="api-settings-body">
+        API settings <i class="toggle-arrow" aria-hidden="true">&#9660;</i>
+      </button>
+      <div class="api-settings-body" id="api-settings-body" role="region">
+        <div class="api-settings-inner">
+          <label class="api-key-label" for="api-key-input">Anthropic API Key</label>
+          <input
+            type="password"
+            id="api-key-input"
+            class="api-key-input"
+            placeholder="sk-ant-..."
+            autocomplete="off"
+            spellcheck="false"
+            aria-describedby="api-key-hint"
+          >
+          <p class="api-key-hint" id="api-key-hint">
+            Stored in your browser's localStorage only &mdash; never sent anywhere except the
+            <a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer">Anthropic API</a>.
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="milestone-toast" role="status" aria-live="assertive"></div>
@@ -331,10 +549,49 @@
   (function () {
     'use strict';
 
+    /* How often to ask Claude for a reaction (every N clicks) */
+    var AI_TRIGGER_EVERY_N_CLICKS = 10;
+
+    /* ─────────────────────────────────────────────
+       API key – read at call time from localStorage
+    ───────────────────────────────────────────── */
+    var API_KEY_STORAGE_KEY = 'clickCounter_apiKey';
+
+    function getApiKey() {
+      try { return (localStorage.getItem(API_KEY_STORAGE_KEY) || '').trim(); } catch (e) { return ''; }
+    }
+
+    function saveApiKey(val) {
+      try {
+        if (val) { localStorage.setItem(API_KEY_STORAGE_KEY, val); }
+        else      { localStorage.removeItem(API_KEY_STORAGE_KEY); }
+      } catch (e) { /* private mode — ignore */ }
+    }
+
+    /* ─────────────────────────────────────────────
+       Persistence – localStorage
+    ───────────────────────────────────────────── */
+    var STORAGE_KEY = 'clickCounter_count';
+
+    function saveCount(n) {
+      try { localStorage.setItem(STORAGE_KEY, n); } catch (e) { /* private mode */ }
+    }
+
+    function loadCount() {
+      try {
+        var stored = localStorage.getItem(STORAGE_KEY);
+        return stored !== null ? parseInt(stored, 10) : 0;
+      } catch (e) { return 0; }
+    }
+
+    function clearCount() {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+    }
+
     /* ─────────────────────────────────────────────
        State
     ───────────────────────────────────────────── */
-    var count = 0;
+    var count = loadCount();
 
     /* ─────────────────────────────────────────────
        DOM refs
@@ -350,6 +607,30 @@
     var card         = document.getElementById('card');
     var canvas       = document.getElementById('particle-canvas');
     var ctx          = canvas.getContext('2d');
+    var aiBubble     = document.getElementById('ai-bubble');
+    var aiBubbleText = document.getElementById('ai-bubble-text');
+    var apiSettings        = document.getElementById('api-settings');
+    var apiSettingsToggle  = document.getElementById('api-settings-toggle');
+    var apiKeyInput        = document.getElementById('api-key-input');
+
+    /* ─────────────────────────────────────────────
+       API key settings panel – toggle + persistence
+    ───────────────────────────────────────────── */
+    /* Restore saved key into the input on load */
+    (function initApiKeyInput() {
+      var saved = getApiKey();
+      if (saved) apiKeyInput.value = saved;
+    }());
+
+    apiSettingsToggle.addEventListener('click', function () {
+      var isOpen = apiSettings.classList.toggle('open');
+      apiSettingsToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      if (isOpen) apiKeyInput.focus();
+    });
+
+    apiKeyInput.addEventListener('input', function () {
+      saveApiKey(apiKeyInput.value.trim());
+    });
 
     /* ─────────────────────────────────────────────
        Resize canvas
@@ -836,10 +1117,125 @@
     }
 
     /* ─────────────────────────────────────────────
+       Claude AI — speech bubble
+    ───────────────────────────────────────────── */
+    var aiInFlight = false; // prevent overlapping requests
+
+    /* Build a contextual prompt based on how deep into clicking we are */
+    function buildPrompt(n) {
+      var context;
+      if      (n <= 5)   context = 'just getting started, a few tentative first clicks';
+      else if (n <= 15)  context = 'warming up nicely, clearly enjoying themselves';
+      else if (n <= 30)  context = 'getting into a rhythm, a bit obsessive already';
+      else if (n <= 50)  context = 'deeply committed — this is a lifestyle choice now';
+      else if (n <= 75)  context = 'absolutely relentless, a clicking machine';
+      else if (n <= 100) context = 'approaching legendary status, a hundred clicks in sight';
+      else if (n <= 150) context = 'a certified click goblin, beyond reason or redemption';
+      else               context = 'transcended ordinary human clicking, basically a deity';
+
+      return (
+        'You are a delightfully dramatic AI who has been watching someone click a button ' +
+        'on a webpage. They have now clicked it ' + n + ' time' + (n === 1 ? '' : 's') + '. ' +
+        'They are ' + context + '. ' +
+        'React with exactly ONE short, punchy sentence (under 18 words). ' +
+        'Be witty, enthusiastic, and slightly over-the-top. ' +
+        'No emojis — the UI already has plenty. ' +
+        'Do not start with "I". ' +
+        'Do not use quotation marks around your response.'
+      );
+    }
+
+    function showBubbleLoading() {
+      aiBubbleText.textContent = 'Thinking';
+      aiBubble.classList.add('loading', 'visible');
+      aiBubble.classList.remove('ai-swap');
+    }
+
+    function showBubbleText(text) {
+      aiBubble.classList.remove('loading');
+      aiBubble.classList.add('ai-swap');
+      // Update text mid-animation for a smooth swap feel
+      setTimeout(function() {
+        aiBubbleText.textContent = text;
+      }, 160);
+    }
+
+    function hideBubble() {
+      aiBubble.classList.remove('visible', 'loading', 'ai-swap');
+    }
+
+    function askClaude(n) {
+      /* Silently skip if no key is configured */
+      var ANTHROPIC_API_KEY = getApiKey();
+      if (!ANTHROPIC_API_KEY) return;
+      /* Skip if a request is already in flight */
+      if (aiInFlight) return;
+
+      aiInFlight = true;
+      showBubbleLoading();
+
+      fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type':         'application/json',
+          'x-api-key':            ANTHROPIC_API_KEY,
+          'anthropic-version':    '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model:      'claude-haiku-4-5-20251001',
+          max_tokens: 80,
+          messages: [
+            { role: 'user', content: buildPrompt(n) }
+          ]
+        })
+      })
+      .then(function(response) {
+        if (!response.ok) {
+          return response.json().then(function(err) {
+            throw new Error(err.error && err.error.message ? err.error.message : 'API error ' + response.status);
+          });
+        }
+        return response.json();
+      })
+      .then(function(data) {
+        var text = data.content && data.content[0] && data.content[0].text
+          ? data.content[0].text.trim()
+          : null;
+        if (text) {
+          showBubbleText(text);
+        } else {
+          hideBubble();
+        }
+      })
+      .catch(function(err) {
+        /* On error show a brief note then fade out */
+        aiBubble.classList.remove('loading');
+        aiBubbleText.textContent = 'Claude is unavailable right now.';
+        setTimeout(hideBubble, 3000);
+        console.warn('[Claude API]', err.message || err);
+      })
+      .finally(function() {
+        aiInFlight = false;
+      });
+    }
+
+    /* Decide whether this click count should trigger an AI call */
+    function maybeAskClaude(n) {
+      if (!getApiKey()) return;
+      var isMilestone = !!milestones[n];
+      var isInterval  = (n % AI_TRIGGER_EVERY_N_CLICKS === 0);
+      if (isMilestone || isInterval) {
+        askClaude(n);
+      }
+    }
+
+    /* ─────────────────────────────────────────────
        Main click handler
     ───────────────────────────────────────────── */
     clickBtn.addEventListener('click', function (e) {
       count += 1;
+      saveCount(count);
 
       /* Sound */
       playClick(count);
@@ -869,6 +1265,9 @@
       /* Milestone */
       showMilestone(count);
 
+      /* Claude AI reaction */
+      maybeAskClaude(count);
+
       /* Particles from click position */
       var rect = clickBtn.getBoundingClientRect();
       var cx   = rect.left + rect.width  / 2;
@@ -882,6 +1281,7 @@
     ───────────────────────────────────────────── */
     resetBtn.addEventListener('click', function () {
       count = 0;
+      clearCount();
       countEl.textContent = 0;
       applyTheme(0);
       currentThemeIdx = -1; // force re-apply next click
@@ -899,6 +1299,8 @@
       toast.classList.remove('show');
       particles = [];
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hideBubble();
+      aiInFlight = false;
     });
 
     /* ─────────────────────────────────────────────
@@ -918,6 +1320,10 @@
 
     card.addEventListener('animationend', function () {
       card.classList.remove('card-shake');
+    });
+
+    aiBubble.addEventListener('animationend', function () {
+      aiBubble.classList.remove('ai-swap');
     });
 
     /* ─────────────────────────────────────────────
@@ -951,10 +1357,29 @@
     });
 
     /* ─────────────────────────────────────────────
-       Init
+       Init – restore persisted state
     ───────────────────────────────────────────── */
-    applyTheme(0);
-    updateProgress(0);
+    if (count > 0) {
+      countEl.textContent = count;
+      applyTheme(themeIndex(count));
+      updateMascot(count);
+      activeMascot = getMascot(count);
+      mascotEl.textContent = activeMascot.emoji;
+      mascotEl.setAttribute('aria-label', activeMascot.label);
+      updateBtnLabel(count);
+      updateProgress(count);
+      // Mark all milestones up to the restored count as already seen
+      milestoneList.forEach(function(m) {
+        if (count >= m) milestoneSeen[m] = true;
+      });
+      // Set the personality message bucket so the first new click
+      // doesn't re-announce the wrong bucket
+      lastMsgBucket = getBucket(count);
+      msgEl.textContent = getPersonalityMsg(count);
+    } else {
+      applyTheme(0);
+      updateProgress(0);
+    }
 
   })();
   </script>
